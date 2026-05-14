@@ -1,8 +1,7 @@
-import { data } from '@nx-grapher-demo/data';
-import { utils } from '@nx-grapher-demo/utils';
+import { data } from "@nx-grapher-demo/data";
 
 export function api(): string {
-  return `api uses ${data()} and ${utils()}`;
+  return `api uses ${data()}`;
 }
 
 console.log(api());

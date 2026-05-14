@@ -11,8 +11,9 @@
     "mermaid:affected:stats": "nx-mermaid-grapher -f filtered-affected.json -o stats"
   },
   "devDependencies": {
-    "nx": "20.0.0",
     "@nx/devkit": "20.0.0",
+    "@nx/js": "20.0.0",
+    "nx": "20.0.0",
     "nx-mermaid-grapher": "latest"
   }
 }
