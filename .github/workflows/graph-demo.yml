@@ -82,17 +82,26 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Generate full graph
+        run: pnpm nx graph --file=graph.json
+
       - name: Generate affected graph
-        run: pnpm nx affected:graph --file=affected-graph.json --base=origin/main --head=HEAD
+        run: pnpm nx graph --affected --file=affected-graph.json --base=origin/main --head=HEAD
+
+      - name: Get affected projects list
+        run: pnpm nx show projects --affected --base=origin/main --head=HEAD --json > affected-projects.json
+
+      - name: Filter affected subgraph
+        run: node scripts/filter-affected-graph.js graph.json affected-projects.json filtered-affected.json
 
       - name: Run nx-mermaid-grapher (mermaid raw)
-        run: npx nx-mermaid-grapher -f affected-graph.json -o mermaid --raw > affected-mermaid.txt
+        run: npx nx-mermaid-grapher -f filtered-affected.json -o mermaid --raw > affected-mermaid.txt
 
       - name: Run nx-mermaid-grapher (stats)
-        run: npx nx-mermaid-grapher -f affected-graph.json -o stats > affected-stats.txt
+        run: npx nx-mermaid-grapher -f filtered-affected.json -o stats > affected-stats.txt
 
       - name: Run nx-mermaid-grapher (json)
-        run: npx nx-mermaid-grapher -f affected-graph.json -o json > affected-output.json
+        run: npx nx-mermaid-grapher -f filtered-affected.json -o json > affected-output.json
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

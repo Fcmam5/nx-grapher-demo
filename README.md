@@ -28,9 +28,11 @@ npx nx-mermaid-grapher -f graph.json -o stats
 ### Affected graph
 
 ```bash
-pnpm nx affected:graph --file=affected-graph.json --base=main --head=HEAD
-npx nx-mermaid-grapher -f affected-graph.json -o mermaid --raw
-npx nx-mermaid-grapher -f affected-graph.json -o stats
+pnpm nx graph --affected --file=affected-graph.json --base=main --head=HEAD
+pnpm nx show projects --affected --base=main --head=HEAD --json > affected-projects.json
+node scripts/filter-affected-graph.js graph.json affected-projects.json filtered-affected.json
+npx nx-mermaid-grapher -f filtered-affected.json -o mermaid --raw
+npx nx-mermaid-grapher -f filtered-affected.json -o stats
 ```
 
 ### Other output formats

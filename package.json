@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "graph": "nx graph --file=graph.json",
-    "graph:affected": "nx affected:graph --file=affected-graph.json",
+    "graph:affected": "nx graph --affected --file=affected-graph.json",
     "mermaid": "nx-mermaid-grapher -f graph.json -o mermaid --raw",
     "mermaid:stats": "nx-mermaid-grapher -f graph.json -o stats",
-    "mermaid:affected": "nx-mermaid-grapher -f affected-graph.json -o mermaid --raw",
-    "mermaid:affected:stats": "nx-mermaid-grapher -f affected-graph.json -o stats"
+    "mermaid:affected": "nx-mermaid-grapher -f filtered-affected.json -o mermaid --raw",
+    "mermaid:affected:stats": "nx-mermaid-grapher -f filtered-affected.json -o stats"
   },
   "devDependencies": {
     "nx": "20.0.0",
