@@ -91,3 +91,4 @@ Both apps share `utils`, and both `ui` and `data` depend on `shared`, creating a
 - [nx-mermaid-grapher on GitHub](https://github.com/Fcmam5/nx-mermaid-grapher)
 
 The tool supports multiple output formats designed for AI agents and CI pipelines.
+# test
