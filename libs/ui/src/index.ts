@@ -1,5 +1,5 @@
-import { shared } from '@nx-grapher-demo/shared';
+import { shared } from "@nx-grapher-demo/shared";
 
 export function ui(): string {
-  return `ui(${shared()})`;
+  return `new ui(${shared()})`;
 }
