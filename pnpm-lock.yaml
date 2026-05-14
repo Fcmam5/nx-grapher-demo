@@ -18,8 +18,8 @@ importers:
         specifier: 20.0.0
         version: 20.0.0
       nx-mermaid-grapher:
-        specifier: latest
-        version: 2.0.0
+        specifier: ^2.1.0
+        version: 2.1.0
 
 packages:
 
@@ -1263,8 +1263,8 @@ packages:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
     engines: {node: '>=8'}
 
-  nx-mermaid-grapher@2.0.0:
-    resolution: {integrity: sha512-vJHEfTd5Fx7H7gmTdkiJnXJLavzVx2fUyRJZag9+DjvCTmC/tNMUzWjg8bU4dPzP8Y+fQ2g3n9twRaWg/R28Rw==}
+  nx-mermaid-grapher@2.1.0:
+    resolution: {integrity: sha512-fdq40qIw9B4EJvIHbjzd1zoXgv2nuSVCYFpoUkdsP5/pf7NF/NVv6O0O+BlpgGHYLmKIue9GbodXMFOP+iBO3g==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -2952,7 +2952,7 @@ snapshots:
     dependencies:
       path-key: 3.1.1
 
-  nx-mermaid-grapher@2.0.0: {}
+  nx-mermaid-grapher@2.1.0: {}
 
   nx@20.0.0:
     dependencies:
