@@ -1,0 +1,198 @@
+name: Graph Demo
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  graph-all:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate full graph
+        run: pnpm nx graph --file=graph.json
+
+      - name: Run nx-mermaid-grapher (mermaid raw)
+        run: npx nx-mermaid-grapher -f graph.json -o mermaid --raw > mermaid.txt
+
+      - name: Run nx-mermaid-grapher (stats)
+        run: npx nx-mermaid-grapher -f graph.json -o stats > stats.txt
+
+      - name: Run nx-mermaid-grapher (json)
+        run: npx nx-mermaid-grapher -f graph.json -o json > graph-output.json
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: graph-all
+          path: |
+            graph.json
+            mermaid.txt
+            stats.txt
+            graph-output.json
+
+      - name: Upload comment body parts
+        uses: actions/upload-artifact@v4
+        with:
+          name: graph-all-comment
+          path: |
+            mermaid.txt
+            stats.txt
+
+  graph-affected:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate affected graph
+        run: pnpm nx affected:graph --file=affected-graph.json --base=origin/main --head=HEAD
+
+      - name: Run nx-mermaid-grapher (mermaid raw)
+        run: npx nx-mermaid-grapher -f affected-graph.json -o mermaid --raw > affected-mermaid.txt
+
+      - name: Run nx-mermaid-grapher (stats)
+        run: npx nx-mermaid-grapher -f affected-graph.json -o stats > affected-stats.txt
+
+      - name: Run nx-mermaid-grapher (json)
+        run: npx nx-mermaid-grapher -f affected-graph.json -o json > affected-output.json
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: graph-affected
+          path: |
+            affected-graph.json
+            affected-mermaid.txt
+            affected-stats.txt
+            affected-output.json
+
+      - name: Upload comment body parts
+        uses: actions/upload-artifact@v4
+        with:
+          name: graph-affected-comment
+          path: |
+            affected-mermaid.txt
+            affected-stats.txt
+
+  pr-comment:
+    runs-on: ubuntu-latest
+    needs: [graph-all, graph-affected]
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Download graph-all comment parts
+        uses: actions/download-artifact@v4
+        with:
+          name: graph-all-comment
+          path: graph-all
+
+      - name: Download graph-affected comment parts
+        uses: actions/download-artifact@v4
+        with:
+          name: graph-affected-comment
+          path: graph-affected
+
+      - name: Read files
+        id: readfiles
+        run: |
+          echo "all_mermaid<<EOF" >> $GITHUB_ENV
+          cat graph-all/mermaid.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "all_stats<<EOF" >> $GITHUB_ENV
+          cat graph-all/stats.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "affected_mermaid<<EOF" >> $GITHUB_ENV
+          cat graph-affected/affected-mermaid.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          echo "affected_stats<<EOF" >> $GITHUB_ENV
+          cat graph-affected/affected-stats.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Find existing comment
+        uses: peter-evans/find-comment@v3
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: 'Nx Graph Report'
+
+      - name: Create or update PR comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            ## Nx Graph Report
+
+            <details>
+            <summary><strong>Graph — All Projects</strong></summary>
+
+            ### Mermaid Diagram
+
+            ```mermaid
+            ${{ env.all_mermaid }}
+            ```
+
+            ### Stats
+
+            ```
+            ${{ env.all_stats }}
+            ```
+            </details>
+
+            <details>
+            <summary><strong>Graph — Affected Projects</strong></summary>
+
+            ### Mermaid Diagram
+
+            ```mermaid
+            ${{ env.affected_mermaid }}
+            ```
+
+            ### Stats
+
+            ```
+            ${{ env.affected_stats }}
+            ```
+            </details>

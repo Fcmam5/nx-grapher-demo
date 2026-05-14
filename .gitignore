@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Nx
+.nx/
+
+# Generated graph artifacts
+graph.json
+affected-graph.json
+mermaid.txt
+affected-mermaid.txt
+stats.txt
+affected-stats.txt
+graph-output.json
+affected-output.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
