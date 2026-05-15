@@ -31,19 +31,9 @@ npx nx-mermaid-grapher -f graph.json -o stats
 pnpm nx graph --file=graph.json
 pnpm nx show projects --affected --base=main --head=HEAD --json > affected-projects.json
 
-# Build -p args for the affected subgraph (affected projects + their dependencies)
-node -e "
-const fs = require('fs');
-const graph = JSON.parse(fs.readFileSync('graph.json')).graph;
-const affected = JSON.parse(fs.readFileSync('affected-projects.json'));
-const included = new Set();
-function add(x) { if (included.has(x)) return; included.add(x); (graph.dependencies[x] || []).forEach(d => add(d.target)); }
-affected.forEach(add);
-fs.writeFileSync('affected-args.txt', [...included].map(p => '-p ' + p).join(' '));
-"
-
-npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) -o mermaid --raw
-npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) -o stats
+cat affected-projects.json | jq -r '.[] | "-p " + .' > affected-args.txt
+npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o mermaid --raw
+npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o stats
 ```
 
 ### Other output formats
@@ -61,7 +51,7 @@ npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) -o stats
 The `.github/workflows/graph-demo.yml` pipeline has three jobs:
 
 - **`graph-all`** — runs on every push and PR. Generates the full dependency graph and runs `nx-mermaid-grapher` against it.
-- **`graph-affected`** — runs on PRs only. Uses `nx show projects --affected` to find changed projects, computes the transitive closure (affected + their dependencies), then runs `nx-mermaid-grapher` with `-p` flags to render the subgraph.
+- **`graph-affected`** — runs on PRs only. Uses `nx show projects --affected` to find changed projects, then runs `nx-mermaid-grapher` with `--impact` to render the impact graph (affected projects + their downstream dependencies + upstream dependents).
 - **`pr-comment`** — runs on PRs only, depends on both graph jobs. Downloads the generated Mermaid and stats files, then creates or updates a PR comment with collapsible `<details>` sections.
 
 ## Workspace structure

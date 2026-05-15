@@ -92,30 +92,17 @@ jobs:
       - name: Get affected projects list
         run: pnpm nx show projects --affected --base=origin/main --head=HEAD --json > affected-projects.json
 
-      - name: Compute affected subgraph args
-        run: |
-          node -e "
-          const fs = require('fs');
-          const graph = JSON.parse(fs.readFileSync('graph.json')).graph;
-          const affected = JSON.parse(fs.readFileSync('affected-projects.json'));
-          const included = new Set();
-          function add(x) {
-            if (included.has(x)) return;
-            included.add(x);
-            (graph.dependencies[x] || []).forEach(d => add(d.target));
-          }
-          affected.forEach(add);
-          fs.writeFileSync('affected-args.txt', [...included].map(p => '-p ' + p).join(' '));
-          "
+      - name: Build -p args
+        run: cat affected-projects.json | jq -r '.[] | "-p " + .' > affected-args.txt
 
-      - name: Run nx-mermaid-grapher (mermaid raw)
-        run: npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) -o mermaid --raw > affected-mermaid.txt
+      - name: Run nx-mermaid-grapher with --impact (mermaid raw)
+        run: npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o mermaid --raw > affected-mermaid.txt
 
-      - name: Run nx-mermaid-grapher (stats)
-        run: npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) -o stats > affected-stats.txt
+      - name: Run nx-mermaid-grapher with --impact (stats)
+        run: npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o stats > affected-stats.txt
 
-      - name: Run nx-mermaid-grapher (json)
-        run: npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) -o json > affected-output.json
+      - name: Run nx-mermaid-grapher with --impact (json)
+        run: npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o json > affected-output.json
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
