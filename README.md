@@ -21,8 +21,8 @@ The PR comment is **idempotent** — it updates the same comment on subsequent p
 
 ```bash
 pnpm nx graph --file=graph.json
-npx nx-mermaid-grapher -f graph.json -o mermaid --raw
-npx nx-mermaid-grapher -f graph.json -o stats
+pnpm nx-mermaid-grapher -f graph.json -o mermaid --raw
+pnpm nx-mermaid-grapher -f graph.json -o stats
 ```
 
 ### Affected graph
@@ -32,8 +32,8 @@ pnpm nx graph --file=graph.json
 pnpm nx show projects --affected --base=main --head=HEAD --json > affected-projects.json
 
 cat affected-projects.json | jq -r '.[] | "-p " + .' > affected-args.txt
-npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o mermaid --raw
-npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o stats
+pnpm nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o mermaid --raw
+pnpm nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o stats
 ```
 
 ### Other output formats

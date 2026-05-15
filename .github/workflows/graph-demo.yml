@@ -20,14 +20,14 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 9
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 24
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -37,16 +37,16 @@ jobs:
         run: pnpm nx graph --file=graph.json
 
       - name: Run nx-mermaid-grapher (mermaid raw)
-        run: npx nx-mermaid-grapher -f graph.json -o mermaid --raw > mermaid.txt
+        run: pnpm nx-mermaid-grapher -f graph.json -o mermaid --raw > mermaid.txt
 
       - name: Run nx-mermaid-grapher (stats)
-        run: npx nx-mermaid-grapher -f graph.json -o stats > stats.txt
+        run: pnpm nx-mermaid-grapher -f graph.json -o stats > stats.txt
 
       - name: Run nx-mermaid-grapher (json)
-        run: npx nx-mermaid-grapher -f graph.json -o json > graph-output.json
+        run: pnpm nx-mermaid-grapher -f graph.json -o json > graph-output.json
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: graph-all
           path: |
@@ -56,7 +56,7 @@ jobs:
             graph-output.json
 
       - name: Upload comment body parts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: graph-all-comment
           path: |
@@ -73,7 +73,7 @@ jobs:
           fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 9
 
@@ -96,13 +96,13 @@ jobs:
         run: cat affected-projects.json | jq -r '.[] | "-p " + .' > affected-args.txt
 
       - name: Run nx-mermaid-grapher with --impact (mermaid raw)
-        run: npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o mermaid --raw > affected-mermaid.txt
+        run: pnpm nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o mermaid --raw > affected-mermaid.txt
 
       - name: Run nx-mermaid-grapher with --impact (stats)
-        run: npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o stats > affected-stats.txt
+        run: pnpm nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o stats > affected-stats.txt
 
       - name: Run nx-mermaid-grapher with --impact (json)
-        run: npx nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o json > affected-output.json
+        run: pnpm nx-mermaid-grapher -f graph.json $(cat affected-args.txt) --impact -o json > affected-output.json
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
